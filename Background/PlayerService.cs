@@ -101,7 +101,7 @@ namespace BeatHelperBackend.Background
                 }
 
                 // Wait a lot
-                await Task.Delay(10000, stoppingToken);
+                await Task.Delay(TimeSpan.FromMinutes(10), stoppingToken);
             }
         }
 
@@ -162,6 +162,12 @@ namespace BeatHelperBackend.Background
                     var difficulty = name.Split(' ').Last();
                     var scoreText = song.SelectSingleNode("th[3]/span[1]").InnerText;
                     var score = double.Parse(scoreText, CultureInfo.InvariantCulture);
+
+                    if (score < 1.0)
+                    {
+                        _logger.LogWarning($"Strange song [{name}]: {userId}&page={i}&sort=1");
+                        continue;
+                    }
                     
                     result.Add(new UserSong()
                     {
