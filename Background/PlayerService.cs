@@ -165,7 +165,7 @@ namespace BeatHelperBackend.Background
                     
                     result.Add(new UserSong()
                     {
-                        Hash = hash,
+                        Hash = hash.ToUpper(),
                         Difficulty = difficulty,
                         Score = score
                     });

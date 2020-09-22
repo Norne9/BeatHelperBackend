@@ -23,19 +23,20 @@ namespace BeatHelperBackend.Controllers
         [HttpGet]
         public IEnumerable<string> Get()
         {
-            var processed = _database.GetCollection<SongData>().Query()
-                .Select(s => s.Hash).ToEnumerable();
+            var processed = new HashSet<string>(
+                _database.GetCollection<SongData>().Query()
+                    .Select(s => s.Hash.ToUpper()).ToEnumerable());
 
             return _database.GetCollection<Song>().Query()
                 .Select(s => s.Hash).ToEnumerable().Distinct()
-                .Where(s => !processed.Contains(s));
+                .Where(s => !processed.Contains(s.ToUpper()));
         }
 
         [HttpPost]
         public IActionResult Post([FromBody] SongData songData)
         {
             var dataCol = _database.GetCollection<SongData>();
-            var record = dataCol.Query().Where(s => s.Hash == songData.Hash).FirstOrDefault();
+            var record = dataCol.Query().Where(s => s.Hash == songData.Hash.ToUpper()).FirstOrDefault();
             if (record != null)
             {
                 return new BadRequestResult();
