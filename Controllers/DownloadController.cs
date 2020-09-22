@@ -26,7 +26,7 @@ namespace BeatHelperBackend.Controllers
             var processed = _database.GetCollection<SongData>().Query()
                 .Select(s => s.Hash).ToEnumerable();
 
-            return _database.GetCollection<Song>("songs").Query()
+            return _database.GetCollection<Song>().Query()
                 .Where(s => !processed.Contains(s.Hash))
                 .Select(s => s.Hash).ToEnumerable();
         }
