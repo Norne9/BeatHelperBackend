@@ -18,6 +18,7 @@ namespace BeatHelperBackend.Background
         private readonly IHttpClientFactory _clientFactory;
         private readonly List<int> _targetPages = GetPages();
         private readonly LiteDatabase _database;
+        private readonly Random _random;
 
         public PlayerService(ILogger<PlayerService> logger, IHttpClientFactory clientFactory,
             LiteDbContext dbContext)
@@ -25,6 +26,7 @@ namespace BeatHelperBackend.Background
             _logger = logger;
             _clientFactory = clientFactory;
             _database = dbContext.Database;
+            _random = new Random();
         }
         
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -40,7 +42,8 @@ namespace BeatHelperBackend.Background
                     string id;
                     try
                     {
-                        (id, _) = (await GetUsersOnPage(page, stoppingToken))[0];
+                        var users = await GetUsersOnPage(page, stoppingToken);
+                        id = users[_random.Next(users.Count)].id;
                     }
                     catch (Exception e)
                     {
@@ -151,7 +154,7 @@ namespace BeatHelperBackend.Background
                 
                 var doc = new HtmlDocument();
                 doc.LoadHtml(respStr);
-
+                
                 var songs = doc.DocumentNode
                     .SelectNodes("/html/body/div/div/div/div[2]/div[2]/table/tbody/tr");
                 foreach (var song in songs)
