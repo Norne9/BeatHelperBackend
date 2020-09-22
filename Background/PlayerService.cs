@@ -38,7 +38,6 @@ namespace BeatHelperBackend.Background
                     
                     // Get user id & score
                     string id;
-                    
                     try
                     {
                         (id, _) = (await GetUsersOnPage(page, stoppingToken))[0];
@@ -50,7 +49,7 @@ namespace BeatHelperBackend.Background
                     }
                     
                     // Get user songs
-                    List<Song> songs;
+                    List<UserSong> songs;
                     double playerScore;
                     try
                     {
@@ -67,7 +66,7 @@ namespace BeatHelperBackend.Background
                     // Put to base
                     try
                     {
-                        var songCol = _database.GetCollection<SongData>("songs");
+                        var songCol = _database.GetCollection<Song>();
                         foreach (var song in songs)
                         {
                             var dbSong = songCol.Query()
@@ -75,10 +74,9 @@ namespace BeatHelperBackend.Background
                                 .FirstOrDefault();
                             if (dbSong == null)
                             {
-                                songCol.Insert(new SongData()
+                                songCol.Insert(new Song()
                                 {
                                     Hash = song.Hash,
-                                    Name = song.Name,
                                     Difficulty = song.Difficulty,
                                     BestScore = song.Score,
                                     WorstScore = song.Score,
@@ -137,9 +135,9 @@ namespace BeatHelperBackend.Background
             return result;
         }
 
-        private async Task<List<Song>> GetUserSongs(string userId, CancellationToken stoppingToken)
+        private async Task<List<UserSong>> GetUserSongs(string userId, CancellationToken stoppingToken)
         {
-            var result = new List<Song>();
+            var result = new List<UserSong>();
             
             using var client = _clientFactory.CreateClient();
             client.Timeout = TimeSpan.FromSeconds(10);
@@ -162,14 +160,12 @@ namespace BeatHelperBackend.Background
                         .Attributes["src"].Value.Split('/').Last().Split('.').First();
                     var name = song.SelectSingleNode("th[2]/div/div[2]/a/span[1]").InnerText;
                     var difficulty = name.Split(' ').Last();
-                    name = string.Join(' ', name.Split(' ').SkipLast(1));
                     var scoreText = song.SelectSingleNode("th[3]/span[1]").InnerText;
                     var score = double.Parse(scoreText, CultureInfo.InvariantCulture);
                     
-                    result.Add(new Song()
+                    result.Add(new UserSong()
                     {
                         Hash = hash,
-                        Name = name,
                         Difficulty = difficulty,
                         Score = score
                     });

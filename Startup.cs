@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using BeatHelperBackend.Background;
 using BeatHelperBackend.Data;
@@ -32,7 +34,9 @@ namespace BeatHelperBackend
             
             services.AddControllers();
             services.AddSingleton<LiteDbContext>();
+            
             services.AddHttpClient();
+
             services.AddHostedService<PlayerService>();
         }
 
