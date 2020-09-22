@@ -198,8 +198,8 @@ namespace BeatHelperBackend.Background
 
         private static double MoveValue(double from, double to, bool prefferUp)
         {
-            const double low = 0.001;
-            const double high = 0.01;
+            const double low = 0.01;
+            const double high = 0.1;
 
             double speed;
             if (prefferUp)
