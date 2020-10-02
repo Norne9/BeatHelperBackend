@@ -27,7 +27,7 @@ namespace BeatHelperBackend.Controllers
             var dataCol = _database.GetCollection<SongData>();
             
             var goodSongs = songCol.Query()
-                .Where(s => s.ScoreToPass < avgScore && s.BestScore > minScore)
+                .Where(s => s.ScoreToPass < avgScore && s.WorstScore > minScore)
                 .ToEnumerable();
 
             return from song in goodSongs
