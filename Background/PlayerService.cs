@@ -145,7 +145,7 @@ namespace BeatHelperBackend.Background
             using var client = _clientFactory.CreateClient();
             client.Timeout = TimeSpan.FromSeconds(10);
 
-            for (var i = 1; i <= 5; i++)
+            for (var i = 1; i <= 10; i++)
             {
                 var resp = await client.SendAsync(new HttpRequestMessage(HttpMethod.Get,
                     $"https://scoresaber.com/u/{userId}&page={i}&sort=1"), stoppingToken);
@@ -167,11 +167,8 @@ namespace BeatHelperBackend.Background
                     var score = double.Parse(scoreText, CultureInfo.InvariantCulture);
 
                     if (score < 1.0)
-                    {
-                        _logger.LogWarning($"Strange song [{name}]: {userId}&page={i}&sort=1");
-                        continue;
-                    }
-                    
+                        return result;
+
                     result.Add(new UserSong()
                     {
                         Hash = hash.ToUpper(),
@@ -196,16 +193,14 @@ namespace BeatHelperBackend.Background
             return result;
         }
 
-        private static double MoveValue(double from, double to, bool prefferUp)
+        private static double MoveValue(double from, double to, bool preferUp)
         {
-            const double low = 0.01;
-            const double high = 0.1;
+            const double low = 0.001;
+            const double high = 0.01;
 
-            double speed;
-            if (prefferUp)
-                speed = to > from ? high : low;
-            else
-                speed = to < from ? high : low;
+            var speed = preferUp ?
+                (to > from ? high : low) :
+                (to < from ? high : low);
 
             return to * speed + from * (1.0 - speed);
         }
