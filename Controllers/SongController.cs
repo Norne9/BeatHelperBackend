@@ -12,19 +12,20 @@ namespace BeatHelperBackend.Controllers
     public class SongController : ControllerBase
     {
         private readonly ILogger<SongController> _logger;
-        private readonly LiteDatabase _database;
+        private readonly LiteDbContext _database;
 
         public SongController(ILogger<SongController> logger, LiteDbContext dbContext)
         {
             _logger = logger;
-            _database = dbContext.Database;
+            _database = dbContext;
         }
 
         public IEnumerable<SongResponse> Get([FromQuery] double avgScore, [FromQuery] double minScore)
         {
+            using var db = _database.Open();
             _logger.LogTrace($"Request [{avgScore} | {minScore}]");
-            var songCol = _database.GetCollection<Song>();
-            var dataCol = _database.GetCollection<SongData>();
+            var songCol = db.GetCollection<Song>();
+            var dataCol = db.GetCollection<SongData>();
             
             var goodSongs = songCol.Query()
                 .Where(s => s.ScoreToPass < avgScore && s.WorstScore > minScore)

@@ -17,7 +17,7 @@ namespace BeatHelperBackend.Background
         private readonly ILogger<PlayerService> _logger;
         private readonly IHttpClientFactory _clientFactory;
         private readonly List<int> _targetPages = GetPages();
-        private readonly LiteDatabase _database;
+        private readonly LiteDbContext _database;
         private readonly Random _random;
 
         public PlayerService(ILogger<PlayerService> logger, IHttpClientFactory clientFactory,
@@ -25,7 +25,7 @@ namespace BeatHelperBackend.Background
         {
             _logger = logger;
             _clientFactory = clientFactory;
-            _database = dbContext.Database;
+            _database = dbContext;
             _random = new Random();
         }
         
@@ -69,7 +69,8 @@ namespace BeatHelperBackend.Background
                     // Put to base
                     try
                     {
-                        var songCol = _database.GetCollection<Song>();
+                        using var db = _database.Open();
+                        var songCol = db.GetCollection<Song>();
                         foreach (var song in songs)
                         {
                             var dbSong = songCol.Query()

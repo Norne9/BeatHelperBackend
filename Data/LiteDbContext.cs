@@ -6,22 +6,15 @@ using Microsoft.Extensions.Options;
 
 namespace BeatHelperBackend.Data
 {
-    public class LiteDbContext : IDisposable
+    public class LiteDbContext
     {
-        private readonly ILogger<LiteDbContext> _logger;
-        public LiteDatabase Database { get; }
+        private readonly string _connectionString;
 
-        public LiteDbContext(IOptions<LiteDbOptions> options, ILogger<LiteDbContext> logger)
+        public LiteDbContext(IOptions<LiteDbOptions> options)
         {
-            Database = new LiteDatabase(options.Value.ConnectionString);
-            _logger = logger;
-            _logger.LogInformation("Database opened!");
+            _connectionString = options.Value.ConnectionString;
         }
 
-        public void Dispose()
-        {
-            Database?.Dispose();
-            _logger.LogInformation("Database closed!");
-        }
+        public LiteDatabase Open() => new LiteDatabase(_connectionString);
     }
 }
