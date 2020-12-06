@@ -28,9 +28,11 @@ namespace BeatHelperBackend.Controllers
                 db.GetCollection<SongData>().Query()
                     .Select(s => s.Hash.ToUpper()).ToEnumerable());
 
-            return db.GetCollection<Song>().Query()
+            var result = db.GetCollection<Song>().Query()
                 .Select(s => s.Hash).ToEnumerable().Distinct()
-                .Where(s => !processed.Contains(s.ToUpper()));
+                .Where(s => !processed.Contains(s.ToUpper()))
+                .ToList();
+            return result;
         }
 
         [HttpPost]

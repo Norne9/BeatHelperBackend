@@ -31,7 +31,7 @@ namespace BeatHelperBackend.Controllers
                 .Where(s => s.ScoreToPass < avgScore && s.WorstScore > minScore)
                 .ToEnumerable();
 
-            return from song in goodSongs
+            var songs = from song in goodSongs
                 let data = dataCol.Query()
                     .Where(s => s.Hash == song.Hash)
                     .FirstOrDefault()
@@ -46,6 +46,8 @@ namespace BeatHelperBackend.Controllers
                     BestScore = song.BestScore,
                     WorstScore = song.WorstScore
                 };
+            var songList = songs.ToList();
+            return songList;
         }
     }
 }
